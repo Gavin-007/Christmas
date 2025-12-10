@@ -832,7 +832,7 @@
       const h = CONFIG.particles.treeHeight;
       const halfH = h / 2;
 
-      // 底部大圈 & 中上小圈，显式半径控制
+      // 底部大圈 & 中上小圈
       const levelConfigs = [
         { t: 0.38, radius: 4.6 }, // 底部圈
         { t: 0.64, radius: 2.3 }  // 上面小圈
@@ -866,11 +866,11 @@
       });
     }
 
-    // 顶部五角星灯头：直接绑在树尖上，跟树一起转，不再翻来翻去
+    // 顶部五角星灯头：更饱满 + 永远一个尖朝上
     function createStarTopper() {
       const starShape = new THREE.Shape();
-      const outerR = 1.7;
-      const innerR = 0.7;
+      const outerR = 1.8;   // 外圈稍微大一点
+      const innerR = 1.0;   // 内圈不要太瘦，星星更饱满
       const points = 5;
 
       for (let i = 0; i < points * 2; i++) {
@@ -884,10 +884,10 @@
       starShape.closePath();
 
       const extrudeSettings = {
-        depth: 0.45,
+        depth: 0.6,
         bevelEnabled: true,
-        bevelThickness: 0.15,
-        bevelSize: 0.18,
+        bevelThickness: 0.2,
+        bevelSize: 0.22,
         bevelSegments: 4
       };
 
@@ -906,19 +906,19 @@
       });
 
       const star = new THREE.Mesh(starGeo, starMat);
-      // 稍微离树尖一点点，避免完全嵌进去，但不会像悬空那么远
-      star.position.set(0, CONFIG.particles.treeHeight / 2 + 0.85, 0);
-      star.rotation.y = Math.PI / 5; // 一个尖朝前
-      star.userData.baseRotY = star.rotation.y;
+      // 让树尖刚好顶在星星底部两个尖尖的中间
+      star.position.set(0, CONFIG.particles.treeHeight / 2 + 0.35, 0);
+      star.rotation.set(0, 0, 0);
+      star.userData.baseScale = 1.0;
       star.castShadow = true;
 
-      const innerGeo = new THREE.SphereGeometry(0.35, 24, 24);
+      const innerGeo = new THREE.SphereGeometry(0.38, 24, 24);
       const innerMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
       const inner = new THREE.Mesh(innerGeo, innerMat);
-      inner.position.set(0, 0, 0.15);
+      inner.position.set(0, 0, 0.2);
       star.add(inner);
 
-      const haloGeo = new THREE.PlaneGeometry(7, 7);
+      const haloGeo = new THREE.PlaneGeometry(7.5, 7.5);
       const haloMat = new THREE.MeshBasicMaterial({
         map: new THREE.TextureLoader().load(
           'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/sprites/glow.png'
@@ -926,7 +926,7 @@
         blending: THREE.AdditiveBlending,
         depthWrite: false,
         transparent: true,
-        opacity: 0.34,
+        opacity: 0.36,
         color: 0xffe6aa
       });
       const halo = new THREE.Mesh(haloGeo, haloMat);
@@ -1155,15 +1155,16 @@
       bgGroup.rotation.y -= 0.05 * dt;
       bgGroup.rotation.z += 0.02 * dt;
 
-      // 五角星：跟树一起转，只做轻微呼吸 & 细微 yaw，不再翻转错位
+      // ⭐ 五角星：抵消树的 x / z 倾斜，保证一个尖始终朝上
       if (STATE.starMesh) {
-        const baseRotY = STATE.starMesh.userData.baseRotY || 0;
-        STATE.starMesh.rotation.y =
-          baseRotY + Math.sin(STATE.time * 0.3) * 0.06;
-        STATE.starMesh.rotation.x = 0;
-        STATE.starMesh.rotation.z = 0;
+        // 抵消主树在 x / z 上的倾斜，让星星在屏幕里竖直
+        STATE.starMesh.rotation.x = -mainGroup.rotation.x;
+        STATE.starMesh.rotation.z = -mainGroup.rotation.z;
+        STATE.starMesh.rotation.y = 0; // 不再绕自身旋转
 
-        const s = 1.0 + Math.sin(STATE.time * 1.3) * 0.03;
+        // 轻微呼吸缩放
+        const baseScale = STATE.starMesh.userData.baseScale || 1.0;
+        const s = baseScale * (1 + 0.05 * Math.sin(STATE.time * 1.3));
         STATE.starMesh.scale.set(s, s, s);
       }
 
