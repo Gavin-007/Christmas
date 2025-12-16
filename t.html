@@ -13,7 +13,7 @@
       font-family: 'Times New Roman', serif;
     }
 
-    /* 背景雪花 + 渐变散景层（2D，半透明盖在树上） */
+    /* 背景雪花层（2D，盖在树上） */
     #bg-overlay {
       position: absolute;
       inset: 0;
@@ -46,10 +46,11 @@
       align-items: center;
       padding-top: 3vh;
       box-sizing: border-box;
+      /* 轻微中心高亮，基本看不出“雾” */
       background: radial-gradient(
         circle at center,
-        transparent 0%,
-        rgba(0, 0, 0, 0.25) 100%
+        rgba(0, 0, 0, 0.0) 0%,
+        rgba(0, 0, 0, 0.12) 100%
       );
     }
 
@@ -137,7 +138,7 @@
       pointer-events: auto;
       border-radius: 999px;
       border: 1px solid rgba(212, 175, 55, 0.7);
-      background: rgba(10, 10, 10, 0.7);
+      background: rgba(10, 10, 10, 0.78);
       color: #f9e7b0;
       padding: 8px 18px;
       font-size: 12px;
@@ -160,18 +161,26 @@
     }
 
     #instructions {
-      color: rgba(255, 255, 255, 0.86);
-      font-family: 'Cinzel', serif;
       pointer-events: none;
       text-align: left;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      backdrop-filter: blur(4px);
     }
     .inst-item {
-      margin-bottom: 8px;
+      margin-bottom: 4px;
       font-size: 13px;
       display: flex;
       align-items: center;
+      color: rgba(255, 255, 255, 0.88);
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
       letter-spacing: 1px;
+      white-space: nowrap;
+    }
+    .inst-item:last-child {
+      margin-bottom: 0;
     }
     .inst-icon {
       display: inline-flex;
@@ -181,14 +190,14 @@
       border-radius: 50%;
       align-items: center;
       justify-content: center;
-      margin-right: 12px;
-      background: rgba(0, 0, 0, 0.6);
-      color: #d4af37;
+      margin-right: 10px;
+      background: radial-gradient(circle at 30% 20%, #fcecb9, #6b5121);
+      color: #000;
       font-size: 16px;
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
     }
 
-    /* 颜色面板 */
+    /* 颜色面板（仅圆点，没有文字 COLORS） */
     #color-panel {
       position: absolute;
       bottom: 26px;
@@ -198,17 +207,12 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 18px;
+      padding: 8px 14px;
       border-radius: 999px;
-      background: rgba(5, 5, 5, 0.78);
+      background: rgba(5, 5, 5, 0.82);
       border: 1px solid rgba(212, 175, 55, 0.35);
       box-shadow: 0 0 18px rgba(0, 0, 0, 0.85);
       font-family: 'Cinzel', serif;
-    }
-    .color-label {
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 11px;
-      letter-spacing: 3px;
     }
     .color-dots {
       display: flex;
@@ -288,9 +292,6 @@
         padding: 6px 12px;
         gap: 8px;
       }
-      .color-label {
-        display: none;  /* 手机上只留圆点 */
-      }
     }
   </style>
 
@@ -336,17 +337,16 @@
       <div id="instructions">
         <div class="inst-item">
           <span class="inst-icon">✊</span>
-          <span>TREE · 握拳聚拢成树</span>
+          <span>握拳 · 聚拢成树</span>
         </div>
         <div class="inst-item">
           <span class="inst-icon">🖐</span>
-          <span>SCATTER · 张开散成星海</span>
+          <span>张开 · 散成星海</span>
         </div>
       </div>
     </div>
 
     <div id="color-panel">
-      <div class="color-label">COLORS</div>
       <div class="color-dots">
         <button class="color-dot active" data-theme="0" aria-label="Gold"></button>
         <button class="color-dot" data-theme="1" aria-label="Blue"></button>
@@ -407,60 +407,35 @@
         dustColor: 0xffffff,
         bgStarColor: 0xbfc7da,
         starColor: 0xfff3c0,
-        starEmissive: 0xffd890,
-        overlay: {
-          top: 'rgba(15, 10, 5, 0.75)',
-          mid: 'rgba(5, 4, 10, 0.35)',
-          bottom: 'rgba(40, 20, 10, 0.88)'
-        }
+        starEmissive: 0xffd890
       },
       {
         name: 'blue',
         dustColor: 0xe6f0ff,
         bgStarColor: 0x9fb8ff,
         starColor: 0xf6fbff,
-        starEmissive: 0x93b5ff,
-        overlay: {
-          top: 'rgba(6, 15, 32, 0.80)',
-          mid: 'rgba(4, 8, 20, 0.40)',
-          bottom: 'rgba(9, 5, 18, 0.86)'
-        }
+        starEmissive: 0x93b5ff
       },
       {
         name: 'violet',
         dustColor: 0xf7edff,
         bgStarColor: 0xc7b3ff,
         starColor: 0xfdf5ff,
-        starEmissive: 0xc99bff,
-        overlay: {
-          top: 'rgba(21, 9, 36, 0.80)',
-          mid: 'rgba(10, 4, 18, 0.40)',
-          bottom: 'rgba(9, 5, 18, 0.88)'
-        }
+        starEmissive: 0xc99bff
       },
       {
         name: 'emerald',
         dustColor: 0xe9fff4,
         bgStarColor: 0xa8f0c9,
         starColor: 0xf7fff7,
-        starEmissive: 0x7fdba4,
-        overlay: {
-          top: 'rgba(4, 20, 14, 0.78)',
-          mid: 'rgba(3, 10, 8, 0.38)',
-          bottom: 'rgba(6, 4, 10, 0.86)'
-        }
+        starEmissive: 0x7fdba4
       },
       {
         name: 'rose',
         dustColor: 0xfff2f7,
         bgStarColor: 0xffc0d6,
         starColor: 0xfff6f9,
-        starEmissive: 0xffa6c0,
-        overlay: {
-          top: 'rgba(28, 3, 15, 0.80)',
-          mid: 'rgba(12, 4, 10, 0.38)',
-          bottom: 'rgba(6, 4, 10, 0.88)'
-        }
+        starEmissive: 0xffa6c0
       }
     ];
 
@@ -474,9 +449,6 @@
     };
 
     let currentThemeIndex = 0;
-    let overlayTheme = THEMES[0].overlay;
-    let snowflakeSprite = null;
-
     let scene, camera, renderer, composer;
     let mainGroup, starGroup, bgGroup;
     let clock = new THREE.Clock();
@@ -498,6 +470,8 @@
     let bgStarsMaterial;
     let starMaterial;
     let garlandMaterials = [];
+
+    let snowflakeSprite = null;
 
     async function init() {
       initThree();
@@ -560,7 +534,7 @@
       mainGroup.add(starGroup);
     }
 
-    /* ============= 2D 叠加层（雾 + 雪花） ============= */
+    /* ============= 2D 雪花层（无雾，只雪+少量散景） ============= */
 
     function createSnowflakeSprite() {
       const size = 64;
@@ -620,7 +594,7 @@
       resizeOverlay();
       window.addEventListener('resize', resizeOverlay);
 
-      // 雪花数量更少、更小、更慢
+      // 雪花数量适中、尺寸小、不遮挡树
       const snowCount = 80;
       snowflakes = [];
       for (let i = 0; i < snowCount; i++) {
@@ -636,17 +610,17 @@
         });
       }
 
-      const bokehCount = 7;
+      const bokehCount = 6;
       bokehLights = [];
       for (let i = 0; i < bokehCount; i++) {
         bokehLights.push({
           x: Math.random() * overlayW,
           y: Math.random() * overlayH,
-          r: 140 + Math.random() * 140,
-          baseAlpha: 0.02 + Math.random() * 0.025,
+          r: 120 + Math.random() * 120,
+          baseAlpha: 0.015 + Math.random() * 0.02,
           phase: Math.random() * Math.PI * 2,
-          driftX: -6 + Math.random() * 12,
-          driftY: -4 + Math.random() * 8
+          driftX: -4 + Math.random() * 8,
+          driftY: -3 + Math.random() * 6
         });
       }
 
@@ -658,19 +632,7 @@
       const w = overlayW, h = overlayH;
       overlayCtx.clearRect(0, 0, w, h);
 
-      // 渐变雾：整体透明度降低一档
-      const grad = overlayCtx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, overlayTheme.top);
-      grad.addColorStop(0.4, overlayTheme.mid);
-      grad.addColorStop(1, overlayTheme.bottom);
-
-      overlayCtx.save();
-      overlayCtx.globalAlpha = 0.45;
-      overlayCtx.fillStyle = grad;
-      overlayCtx.fillRect(0, 0, w, h);
-      overlayCtx.restore();
-
-      // 散景
+      // 少量散景光晕（不会形成“雾墙”）
       overlayCtx.save();
       overlayCtx.globalCompositeOperation = 'lighter';
       bokehLights.forEach(b => {
@@ -681,7 +643,7 @@
         if (b.y < -b.r) b.y = h + b.r;
         if (b.y > h + b.r) b.y = -b.r;
 
-        const alpha = b.baseAlpha + Math.sin(STATE.time * 0.4 + b.phase) * 0.02;
+        const alpha = b.baseAlpha + Math.sin(STATE.time * 0.4 + b.phase) * 0.015;
         const radial = overlayCtx.createRadialGradient(
           b.x, b.y, 0, b.x, b.y, b.r
         );
@@ -694,7 +656,7 @@
       });
       overlayCtx.restore();
 
-      // 雪花（用雪花 sprite）
+      // 雪花
       overlayCtx.save();
       const img = snowflakeSprite;
       snowflakes.forEach(s => {
@@ -715,8 +677,8 @@
           const scale = s.size / img.width;
           overlayCtx.scale(scale, scale);
 
-          const baseAlpha = 0.28;
-          const flicker = 0.18 * Math.sin(STATE.time * 1.5 + s.phase);
+          const baseAlpha = 0.26;
+          const flicker = 0.16 * Math.sin(STATE.time * 1.5 + s.phase);
           overlayCtx.globalAlpha = baseAlpha + flicker;
 
           overlayCtx.drawImage(img, -img.width / 2, -img.height / 2);
@@ -1050,7 +1012,7 @@
       mainGroup.add(photoMeshGroup);
     }
 
-    // 花环：圈保持基本水平 + 小倾斜；holder 只绕 Y 轴转
+    // 花环
     function createGarlands() {
       const h = CONFIG.particles.treeHeight;
       const halfH = h / 2;
@@ -1141,7 +1103,7 @@
 
       const star = new THREE.Mesh(starGeo, starMaterial);
       star.position.set(0, CONFIG.particles.treeHeight / 2 + 1.2, 0);
-      star.rotation.set(0, Math.PI, 0);   // 上下翻好的那一面
+      star.rotation.set(0, Math.PI, 0);
       star.castShadow = true;
 
       const textureLoader = new THREE.TextureLoader();
@@ -1169,8 +1131,6 @@
     function applyTheme(index) {
       currentThemeIndex = index;
       const theme = THEMES[index];
-
-      overlayTheme = theme.overlay;
 
       if (dustMaterial) {
         dustMaterial.color.set(theme.dustColor);
