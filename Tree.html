@@ -1299,6 +1299,17 @@
     }
 
     async function initMediaPipe() {
+      // iOS 能力自检
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    if (isIOS) {
+      alert('当前 iOS 浏览器不支持摄像头，请在 Safari 里用 HTTPS 链接打开这个页面。');
+    } else {
+      alert('当前浏览器不支持摄像头，请换用 Chrome / Edge 等现代浏览器。');
+    }
+    return;
+  }
   const vision = await FilesetResolver.forVisionTasks(
     'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
   );
