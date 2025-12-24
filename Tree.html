@@ -1300,23 +1300,21 @@
 
     async function initMediaPipe() {
       const vision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
-      );
-      const isIOS =
-  /iPhone|iPad|iPod/i.test(navigator.userAgent) &&
-  /Safari/i.test(navigator.userAgent);
-      handLandmarker = await HandLandmarker.createFromOptions(
-        vision,
-        {
-          baseOptions: {
-            modelAssetPath:
-              'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
-            delegate: isIOS ? 'CPU' : 'GPU'
-          },
-          runningMode: 'VIDEO',
-          numHands: 1
-        }
-      );
+      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm'
+  );
+
+      const ua = navigator.userAgent;
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);  // 不再强依赖 Safari 关键字
+
+      handLandmarker = await HandLandmarker.createFromOptions(vision, {
+        baseOptions: {
+          modelAssetPath:
+          'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',
+          delegate: isIOS ? 'CPU' : 'GPU'
+      },
+      runningMode: 'VIDEO',
+      numHands: 1
+  });
 
       video = document.getElementById('webcam');
       const canvasElement = document.getElementById('webcam-preview');
